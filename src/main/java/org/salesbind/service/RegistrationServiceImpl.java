@@ -2,6 +2,9 @@ package org.salesbind.service;
 
 import org.salesbind.entity.RegistrationAttempt;
 import org.salesbind.entity.VerificationCode;
+import org.salesbind.exception.InvalidVerificationCodeException;
+import org.salesbind.exception.RegistrationAttemptNotFoundException;
+import org.salesbind.exception.TooManyFailedAttemptsException;
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
 import org.salesbind.infrastructure.security.OneTimeCodeGenerator;
 import org.salesbind.repository.RegistrationAttemptRepository;
@@ -37,5 +40,30 @@ public class RegistrationServiceImpl implements RegistrationService {
         attemptRepository.save(attempt, registrationProperties.getTtl());
 
         return attempt.getProvisionId();
+    }
+
+    @Override
+    public void verifyCode(String provisionId, String verificationCode) {
+        RegistrationAttempt attempt = attemptRepository.findByProvisionId(provisionId)
+                .orElseThrow(RegistrationAttemptNotFoundException::new);
+
+        if (attempt.isVerified()) {
+            return; // Success. Idempotent
+        }
+
+        if (attempt.hasExceededMaxAttempts(registrationProperties.getOneTimeCode().getMaxAttempts())) {
+            attemptRepository.delete(attempt);
+            throw new TooManyFailedAttemptsException();
+        }
+
+        var verificationCodeObj = new VerificationCode(verificationCode);
+        boolean verified = attempt.verifyCode(verificationCodeObj);
+
+        if (!verified) {
+            attemptRepository.save(attempt, registrationProperties.getTtl());
+            throw new InvalidVerificationCodeException();
+        }
+
+        attemptRepository.save(attempt, registrationProperties.getTtl());
     }
 }

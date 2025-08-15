@@ -11,4 +11,6 @@ public interface RegistrationAttemptRepository {
     Optional<RegistrationAttempt> findByProvisionId(String provisionId);
 
     Optional<RegistrationAttempt> findByEmail(String email);
+
+    void delete(RegistrationAttempt attempt);
 }

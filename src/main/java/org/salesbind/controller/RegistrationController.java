@@ -2,10 +2,12 @@ package org.salesbind.controller;
 
 import jakarta.validation.Valid;
 import org.salesbind.dto.RequestEmailVerificationRequest;
+import org.salesbind.dto.VerifyCodeRequest;
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
 import org.salesbind.service.RegistrationService;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,5 +43,13 @@ public class RegistrationController {
                 .build();
 
         return ResponseEntity.accepted().header("Set-Cookie", cookie.toString()).build();
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<Void> verifyCode(@CookieValue(SIGNUP_FLOW_ID_COOKIE_NAME) String provisionId,
+            @Valid @RequestBody VerifyCodeRequest request) {
+
+        registrationService.verifyCode(provisionId, request.verificationCode());
+        return ResponseEntity.noContent().build();
     }
 }

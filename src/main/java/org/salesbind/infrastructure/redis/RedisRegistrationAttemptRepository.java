@@ -45,6 +45,12 @@ public class RedisRegistrationAttemptRepository implements RegistrationAttemptRe
         return Optional.ofNullable(provisionId).flatMap(this::findByProvisionId);
     }
 
+    @Override
+    public void delete(RegistrationAttempt attempt) {
+        redisTemplate.delete(key(attempt.getProvisionId()));
+        redisTemplate.delete(emailIndex(attempt.getEmail()));
+    }
+
     private String key(String id) {
         return REGISTRATION_ATTEMPT_KEY + id;
     }
