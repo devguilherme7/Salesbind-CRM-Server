@@ -1,8 +1,11 @@
 package org.salesbind.exception;
 
-public class TooManyFailedAttemptsException extends RuntimeException {
+import org.salesbind.infrastructure.exception.AbstractStatusResponseException;
+import org.springframework.http.HttpStatus;
+
+public class TooManyFailedAttemptsException extends AbstractStatusResponseException {
 
     public TooManyFailedAttemptsException() {
-        super("Too many failed attempts");
+        super(HttpStatus.TOO_MANY_REQUESTS, "Too many failed attempts");
     }
 }

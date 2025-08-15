@@ -7,11 +7,13 @@ import org.salesbind.entity.OrganizationMember;
 import org.salesbind.entity.RegistrationAttempt;
 import org.salesbind.entity.VerificationCode;
 import org.salesbind.exception.CodeRequestTooSoonException;
+import org.salesbind.exception.EmailAlreadyVerifiedException;
 import org.salesbind.exception.EmailNotVerifiedException;
 import org.salesbind.exception.InvalidVerificationCodeException;
-import org.salesbind.exception.RegistrationAttemptNotFoundException;
+import org.salesbind.exception.InvalidRegistrationAttempt;
 import org.salesbind.exception.TooManyFailedAttemptsException;
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
+import org.salesbind.exception.EmailAlreadyExistsException;
 import org.salesbind.infrastructure.security.OneTimeCodeGenerator;
 import org.salesbind.repository.AppUserRepository;
 import org.salesbind.repository.OrganizationMemberRepository;
@@ -55,6 +57,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         RegistrationAttempt attempt = attemptRepository.findByEmail(email)
                 .orElseGet(() -> new RegistrationAttempt(UUID.randomUUID().toString(), email));
 
+        if (attempt.isVerified()) {
+            throw new EmailAlreadyVerifiedException();
+        }
+
         Duration cooldownPeriod = registrationProperties.getOneTimeCode().getRequestCooldown();
         if (!attempt.canRequestNewCode(cooldownPeriod)) {
             Duration remaining = attempt.getRemainingCooldown(cooldownPeriod);
@@ -73,7 +79,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public void verifyCode(String provisionId, String verificationCode) {
         RegistrationAttempt attempt = attemptRepository.findByProvisionId(provisionId)
-                .orElseThrow(RegistrationAttemptNotFoundException::new);
+                .orElseThrow(InvalidRegistrationAttempt::new);
 
         if (attempt.isVerified()) {
             return; // Success. Idempotent
@@ -99,10 +105,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     public void completeRegistration(String provisionId, CompleteRegistrationRequest request) {
         RegistrationAttempt attempt = attemptRepository.findByProvisionId(provisionId)
-                .orElseThrow(RegistrationAttemptNotFoundException::new);
+                .orElseThrow(InvalidRegistrationAttempt::new);
 
         if (!attempt.isVerified()) {
             throw new EmailNotVerifiedException();
+        }
+
+        if (appUserRepository.existsByEmail(attempt.getEmail())) {
+            throw new EmailAlreadyExistsException();
         }
 
         var organization = new Organization(request.organizationName());
