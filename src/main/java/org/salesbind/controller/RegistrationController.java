@@ -1,10 +1,12 @@
 package org.salesbind.controller;
 
 import jakarta.validation.Valid;
+import org.salesbind.dto.CompleteRegistrationRequest;
 import org.salesbind.dto.RequestEmailVerificationRequest;
 import org.salesbind.dto.VerifyCodeRequest;
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
 import org.salesbind.service.RegistrationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -51,5 +53,19 @@ public class RegistrationController {
 
         registrationService.verifyCode(provisionId, request.verificationCode());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/complete")
+    public ResponseEntity<Void> complete(@CookieValue(SIGNUP_FLOW_ID_COOKIE_NAME) String provisionId,
+            @Valid @RequestBody CompleteRegistrationRequest request) {
+
+        registrationService.completeRegistration(provisionId, request);
+        ResponseCookie clearCookie = ResponseCookie.from(SIGNUP_FLOW_ID_COOKIE_NAME)
+                .value("")
+                .maxAge(0)
+                .path("/v1/registrations")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).header("Set-Cookie", clearCookie.toString()).build();
     }
 }
