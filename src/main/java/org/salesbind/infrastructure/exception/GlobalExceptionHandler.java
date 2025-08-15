@@ -1,6 +1,7 @@
 package org.salesbind.infrastructure.exception;
 
 import org.salesbind.exception.TooManyFailedAttemptsException;
+import org.salesbind.infrastructure.cookie.RegistrationCookieManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private final RegistrationCookieManager registrationCookieManager;
+
+    public GlobalExceptionHandler(RegistrationCookieManager registrationCookieManager) {
+        this.registrationCookieManager = registrationCookieManager;
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex,
             @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
@@ -40,11 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             TooManyFailedAttemptsException ex) {
 
         var response = new GlobalApiErrorResponse(ex.getMessage());
-
-        ResponseCookie clearCookie = ResponseCookie.from("SIGNUP_FLOW_ID", "")
-                .maxAge(0)
-                .path("/v1/registrations")
-                .build();
+        ResponseCookie clearCookie = registrationCookieManager.clearCookie();
 
         return ResponseEntity.status(ex.getStatus())
                 .header(HttpHeaders.SET_COOKIE, clearCookie.toString())

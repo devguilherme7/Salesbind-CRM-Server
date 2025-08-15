@@ -7,8 +7,9 @@ import jakarta.validation.Valid;
 import org.salesbind.dto.CompleteRegistrationRequest;
 import org.salesbind.dto.RequestEmailVerificationRequest;
 import org.salesbind.dto.VerifyCodeRequest;
-import org.salesbind.infrastructure.configuration.RegistrationProperties;
+import org.salesbind.infrastructure.cookie.RegistrationCookieManager;
 import org.salesbind.service.RegistrationService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +18,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import static org.salesbind.infrastructure.cookie.RegistrationCookieManager.SIGNUP_FLOW_ID_COOKIE_NAME;
 
 @RestController
 @RequestMapping("/v1/registrations")
 @Tag(name = "Registration", description = "Endpoints for registering new users")
 public class RegistrationController {
 
-    private static final String SIGNUP_FLOW_ID_COOKIE_NAME = "SIGNUP_FLOW_ID";
-
     private final RegistrationService registrationService;
-    private final RegistrationProperties registrationProperties;
+    private final RegistrationCookieManager registrationCookieManager;
 
     public RegistrationController(RegistrationService registrationService,
-            RegistrationProperties registrationProperties) {
+            RegistrationCookieManager registrationCookieManager) {
         this.registrationService = registrationService;
-        this.registrationProperties = registrationProperties;
+        this.registrationCookieManager = registrationCookieManager;
     }
 
     @Operation(
@@ -45,16 +45,7 @@ public class RegistrationController {
     public ResponseEntity<Void> requestVerification(@Valid @RequestBody RequestEmailVerificationRequest request) {
         String sid = registrationService.requestEmailVerification(request.email());
 
-        var maxAge = (int) registrationProperties.getTtl().toSeconds();
-        ResponseCookie cookie = ResponseCookie.from(SIGNUP_FLOW_ID_COOKIE_NAME)
-                .value(sid)
-                .httpOnly(true)
-                .maxAge(maxAge)
-                .path("/v1/registrations")
-                .secure(true)
-                .sameSite("Strict")
-                .build();
-
+        ResponseCookie cookie = registrationCookieManager.createCookie(sid);
         return ResponseEntity.accepted().header("Set-Cookie", cookie.toString()).build();
     }
 
@@ -84,12 +75,8 @@ public class RegistrationController {
             @Valid @RequestBody CompleteRegistrationRequest request) {
 
         registrationService.completeRegistration(provisionId, request);
-        ResponseCookie clearCookie = ResponseCookie.from(SIGNUP_FLOW_ID_COOKIE_NAME)
-                .value("")
-                .maxAge(0)
-                .path("/v1/registrations")
-                .build();
 
-        return ResponseEntity.status(HttpStatus.CREATED).header("Set-Cookie", clearCookie.toString()).build();
+        ResponseCookie clearCookie = registrationCookieManager.clearCookie();
+        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.SET_COOKIE, clearCookie.toString()).build();
     }
 }
