@@ -3,6 +3,7 @@ package org.salesbind.entity;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+@SuppressWarnings("unused")
 public class VerificationCode {
 
     private String value;
@@ -30,5 +31,4 @@ public class VerificationCode {
     public String getValue() {
         return value;
     }
-
 }

@@ -1,17 +1,18 @@
 package org.salesbind.entity;
 
+import java.time.Duration;
 import java.time.Instant;
 
+@SuppressWarnings("unused")
 public class RegistrationAttempt {
 
     private String provisionId;
     private String email;
-
     private VerificationCode verificationCode;
     private Instant verificationCodeExpiresAt;
-
     private boolean verified;
     private int failedAttempts;
+    private Instant lastCodeRequestAt;
 
     public RegistrationAttempt(String provisionId, String email) {
         this.provisionId = provisionId;
@@ -27,6 +28,7 @@ public class RegistrationAttempt {
         this.verificationCodeExpiresAt = expiresAt;
         this.verified = false;
         this.failedAttempts = 0;
+        this.lastCodeRequestAt = Instant.now();
     }
 
     public boolean hasExceededMaxAttempts(int maxAttempts) {
@@ -47,6 +49,29 @@ public class RegistrationAttempt {
 
         this.failedAttempts++;
         return false;
+    }
+
+    public boolean canRequestNewCode(Duration cooldownPeriod) {
+        if (lastCodeRequestAt == null) {
+            // No code has been sent yet, so no cooldown is active.
+            return true;
+        }
+
+        return Instant.now().isAfter(lastCodeRequestAt.plus(cooldownPeriod));
+    }
+
+    public Duration getRemainingCooldown(Duration cooldownPeriod) {
+        if (lastCodeRequestAt == null) {
+            return Duration.ZERO;
+        }
+
+        Instant currentTime = Instant.now();
+        Instant cooldownEndsAt = lastCodeRequestAt.plus(cooldownPeriod);
+        if (currentTime.isAfter(cooldownEndsAt)) {
+            return Duration.ZERO;
+        }
+
+        return Duration.between(currentTime, cooldownEndsAt);
     }
 
     private boolean isExpired() {
@@ -71,5 +96,9 @@ public class RegistrationAttempt {
 
     public boolean isVerified() {
         return verified;
+    }
+
+    public Instant getLastCodeRequestAt() {
+        return lastCodeRequestAt;
     }
 }

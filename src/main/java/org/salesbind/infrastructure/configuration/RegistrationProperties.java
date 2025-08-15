@@ -30,6 +30,7 @@ public class RegistrationProperties {
     public static class OneTimeCodeProperties {
 
         private int maxAttempts;
+        private Duration requestCooldown;
 
         public int getMaxAttempts() {
             return maxAttempts;
@@ -37,6 +38,14 @@ public class RegistrationProperties {
 
         public void setMaxAttempts(int maxAttempts) {
             this.maxAttempts = maxAttempts;
+        }
+
+        public Duration getRequestCooldown() {
+            return requestCooldown;
+        }
+
+        public void setRequestCooldown(Duration requestCooldown) {
+            this.requestCooldown = requestCooldown;
         }
     }
 }

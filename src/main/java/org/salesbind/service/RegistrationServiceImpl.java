@@ -6,6 +6,7 @@ import org.salesbind.entity.Organization;
 import org.salesbind.entity.OrganizationMember;
 import org.salesbind.entity.RegistrationAttempt;
 import org.salesbind.entity.VerificationCode;
+import org.salesbind.exception.CodeRequestTooSoonException;
 import org.salesbind.exception.EmailNotVerifiedException;
 import org.salesbind.exception.InvalidVerificationCodeException;
 import org.salesbind.exception.RegistrationAttemptNotFoundException;
@@ -19,6 +20,7 @@ import org.salesbind.repository.RegistrationAttemptRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -52,6 +54,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     public String requestEmailVerification(String email) {
         RegistrationAttempt attempt = attemptRepository.findByEmail(email)
                 .orElseGet(() -> new RegistrationAttempt(UUID.randomUUID().toString(), email));
+
+        Duration cooldownPeriod = registrationProperties.getOneTimeCode().getRequestCooldown();
+        if (!attempt.canRequestNewCode(cooldownPeriod)) {
+            Duration remaining = attempt.getRemainingCooldown(cooldownPeriod);
+            throw new CodeRequestTooSoonException(remaining);
+        }
 
         var verificationCode = new VerificationCode(oneTimeCodeGenerator.generate(VERIFICATION_CODE_LENGTH));
         Instant expiresAt = Instant.now().plus(registrationProperties.getTtl());
