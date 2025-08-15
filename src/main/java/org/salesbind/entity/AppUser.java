@@ -9,14 +9,19 @@ import jakarta.persistence.Table;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "app_users")
-public class AppUser extends AbstractPersistableCustom {
+public class AppUser extends AbstractPersistableCustom implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -65,7 +70,18 @@ public class AppUser extends AbstractPersistableCustom {
         this.emailVerified = true;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.passwordHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
     }
 }
