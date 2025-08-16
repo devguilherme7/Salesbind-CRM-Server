@@ -13,7 +13,8 @@ import org.salesbind.exception.InvalidVerificationCodeException;
 import org.salesbind.exception.InvalidRegistrationAttempt;
 import org.salesbind.exception.TooManyFailedAttemptsException;
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
-import org.salesbind.exception.EmailAlreadyExistsException;
+import org.salesbind.exception.EmailAlreadyRegisteredException;
+import org.salesbind.infrastructure.email.EmailService;
 import org.salesbind.infrastructure.security.OneTimeCodeGenerator;
 import org.salesbind.repository.AppUserRepository;
 import org.salesbind.repository.OrganizationMemberRepository;
@@ -38,11 +39,13 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final PasswordEncoder passwordEncoder;
     private final AppUserRepository appUserRepository;
     private final OrganizationMemberRepository organizationMemberRepository;
+    private final EmailService emailService;
 
     public RegistrationServiceImpl(RegistrationAttemptRepository attemptRepository,
             RegistrationProperties registrationProperties, OneTimeCodeGenerator oneTimeCodeGenerator,
             OrganizationRepository organizationRepository, PasswordEncoder passwordEncoder,
-            AppUserRepository appUserRepository, OrganizationMemberRepository organizationMemberRepository) {
+            AppUserRepository appUserRepository, OrganizationMemberRepository organizationMemberRepository,
+            EmailService emailService) {
         this.attemptRepository = attemptRepository;
         this.registrationProperties = registrationProperties;
         this.oneTimeCodeGenerator = oneTimeCodeGenerator;
@@ -50,10 +53,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.passwordEncoder = passwordEncoder;
         this.appUserRepository = appUserRepository;
         this.organizationMemberRepository = organizationMemberRepository;
+        this.emailService = emailService;
     }
 
     @Override
     public String requestEmailVerification(String email) {
+        if (appUserRepository.existsByEmail(email)) {
+            throw new EmailAlreadyRegisteredException();
+        }
+
         RegistrationAttempt attempt = attemptRepository.findByEmail(email)
                 .orElseGet(() -> new RegistrationAttempt(UUID.randomUUID().toString(), email));
 
@@ -67,11 +75,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new CodeRequestTooSoonException(remaining);
         }
 
-        var verificationCode = new VerificationCode(oneTimeCodeGenerator.generate(VERIFICATION_CODE_LENGTH));
+        String verificationCode = oneTimeCodeGenerator.generate(VERIFICATION_CODE_LENGTH);
+        var verificationCodeObj = new VerificationCode(verificationCode);
+
         Instant expiresAt = Instant.now().plus(registrationProperties.getTtl());
-        attempt.assignVerificationCode(verificationCode, expiresAt);
+        attempt.assignVerificationCode(verificationCodeObj, expiresAt);
 
         attemptRepository.save(attempt, registrationProperties.getTtl());
+        emailService.sendVerificationCode(email, verificationCode);
 
         return attempt.getProvisionId();
     }
@@ -112,7 +123,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         if (appUserRepository.existsByEmail(attempt.getEmail())) {
-            throw new EmailAlreadyExistsException();
+            throw new EmailAlreadyRegisteredException();
         }
 
         var organization = new Organization(request.organizationName());
