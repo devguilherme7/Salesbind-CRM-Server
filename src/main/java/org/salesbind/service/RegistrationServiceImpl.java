@@ -15,12 +15,12 @@ import org.salesbind.exception.TooManyFailedAttemptsException;
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
 import org.salesbind.exception.EmailAlreadyRegisteredException;
 import org.salesbind.infrastructure.email.EmailService;
+import org.salesbind.infrastructure.security.AppPasswordEncoder;
 import org.salesbind.infrastructure.security.OneTimeCodeGenerator;
 import org.salesbind.repository.AppUserRepository;
 import org.salesbind.repository.OrganizationMemberRepository;
 import org.salesbind.repository.OrganizationRepository;
 import org.salesbind.repository.RegistrationAttemptRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
@@ -36,14 +36,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationProperties registrationProperties;
     private final OneTimeCodeGenerator oneTimeCodeGenerator;
     private final OrganizationRepository organizationRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AppPasswordEncoder passwordEncoder;
     private final AppUserRepository appUserRepository;
     private final OrganizationMemberRepository organizationMemberRepository;
     private final EmailService emailService;
 
     public RegistrationServiceImpl(RegistrationAttemptRepository attemptRepository,
             RegistrationProperties registrationProperties, OneTimeCodeGenerator oneTimeCodeGenerator,
-            OrganizationRepository organizationRepository, PasswordEncoder passwordEncoder,
+            OrganizationRepository organizationRepository, AppPasswordEncoder passwordEncoder,
             AppUserRepository appUserRepository, OrganizationMemberRepository organizationMemberRepository,
             EmailService emailService) {
         this.attemptRepository = attemptRepository;
