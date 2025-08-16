@@ -1,5 +1,6 @@
 package org.salesbind.infrastructure.exception;
 
+import org.salesbind.exception.CodeRequestTooSoonException;
 import org.salesbind.exception.TooManyFailedAttemptsException;
 import org.salesbind.infrastructure.cookie.RegistrationCookieManager;
 import org.slf4j.Logger;
@@ -51,6 +52,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.status(ex.getStatus())
                 .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
+                .body(response);
+    }
+
+    @ExceptionHandler(CodeRequestTooSoonException.class)
+    public ResponseEntity<GlobalApiErrorResponse> handleCodeRequestTooSoonException(CodeRequestTooSoonException ex) {
+        var response = new GlobalApiErrorResponse(ex.getMessage());
+        String retryAfterSeconds = String.valueOf(ex.getRemainingCooldown().toSeconds());
+
+        return ResponseEntity.status(ex.getStatus())
+                .header(HttpHeaders.RETRY_AFTER, retryAfterSeconds)
                 .body(response);
     }
 

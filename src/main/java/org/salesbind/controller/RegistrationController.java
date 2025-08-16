@@ -41,6 +41,7 @@ public class RegistrationController {
                     "has expired")
     @ApiResponse(responseCode = "202", description = "Verification code request accepted. An email has been dispatched")
     @ApiResponse(responseCode = "400", description = "The email may be invalid or this email already verified")
+    @ApiResponse(responseCode = "409", description = "The provided email is already registered")
     @PostMapping("/request-verification-code")
     public ResponseEntity<Void> requestVerification(@Valid @RequestBody RequestEmailVerificationRequest request) {
         String sid = registrationService.requestEmailVerification(request.email());

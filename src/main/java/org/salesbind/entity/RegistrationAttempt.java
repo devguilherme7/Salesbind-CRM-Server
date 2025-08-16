@@ -86,6 +86,10 @@ public class RegistrationAttempt {
         return email;
     }
 
+    public int getFailedAttempts() {
+        return failedAttempts;
+    }
+
     public VerificationCode getVerificationCode() {
         return verificationCode;
     }
