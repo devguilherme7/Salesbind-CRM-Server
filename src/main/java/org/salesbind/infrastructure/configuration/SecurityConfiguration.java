@@ -5,7 +5,7 @@ import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.proc.JWEDecryptionKeySelector;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
-import org.salesbind.infrastructure.security.NimbusJweJwtEncoder;
+import org.salesbind.infrastructure.security.jwt.EncryptedJwtEncoder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,7 +60,7 @@ public class SecurityConfiguration {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        return new NimbusJweJwtEncoder(authenticationProperties.getSecretKey());
+        return new EncryptedJwtEncoder(authenticationProperties.getSecretKey());
     }
 
     @Bean

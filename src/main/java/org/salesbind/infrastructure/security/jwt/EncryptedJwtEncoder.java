@@ -1,4 +1,4 @@
-package org.salesbind.infrastructure.security;
+package org.salesbind.infrastructure.security.jwt;
 
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
@@ -25,11 +25,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class NimbusJweJwtEncoder implements JwtEncoder {
+/**
+ * A {@link JwtEncoder} that creates encrypted JWTs (JWE) using direct encryption
+ * (JWEAlgorithm.DIR) and A256GCM encryption method.
+ *
+ * <p>
+ * This is a low-level infrastructure component responsible for the cryptographic
+ * encoding of the token.
+ * </p>
+ */
+public class EncryptedJwtEncoder implements JwtEncoder {
 
     private final SecretKey cekKey;
 
-    public NimbusJweJwtEncoder(String base64Secret) {
+    public EncryptedJwtEncoder(String base64Secret) {
         Objects.requireNonNull(base64Secret, "base64Secret is required");
         byte[] keyBytes = Base64.getDecoder().decode(base64Secret);
         if (keyBytes.length != 32) {
@@ -104,8 +113,8 @@ public class NimbusJweJwtEncoder implements JwtEncoder {
 
             Map<String, Object> headersMap = new HashMap<>(encryptedJWT.getHeader().toJSONObject());
 
-            Map<String, Object> jwtClaimsForSpring = new HashMap<>();
-            jwtClaimsForSpring.putAll(springClaims.getClaims()); // maintain caller's format
+            // maintain caller's format
+            Map<String, Object> jwtClaimsForSpring = new HashMap<>(springClaims.getClaims());
 
             // Ensures exp/iat exist (Instant) — Spring can extract them via Jwt.getExpiresAt()
             jwtClaimsForSpring.put("iat", issuedAt);
