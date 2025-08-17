@@ -1,7 +1,7 @@
 package org.salesbind.service;
 
 import org.salesbind.dto.LoginRequest;
-import org.salesbind.entity.AppUser;
+import org.salesbind.infrastructure.security.SecurityUser;
 import org.salesbind.infrastructure.security.jwt.AccessTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +24,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-        var principal = (AppUser) authentication.getPrincipal();
+        var principal = (SecurityUser) authentication.getPrincipal();
         return accessTokenProvider.generateToken(principal);
     }
 }

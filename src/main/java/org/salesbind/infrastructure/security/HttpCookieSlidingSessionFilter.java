@@ -4,9 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.salesbind.entity.AppUser;
 import org.salesbind.infrastructure.security.jwt.AccessTokenProvider;
 import org.salesbind.infrastructure.web.AuthenticationStateRepository;
+import org.salesbind.repository.AppUserRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Implements a sliding session mechanism by refreshing the JWT if it's nearing expiration.
@@ -27,11 +28,13 @@ public class HttpCookieSlidingSessionFilter extends OncePerRequestFilter {
 
     private final AccessTokenProvider accessTokenProvider;
     private final AuthenticationStateRepository authenticationStateRepository;
+    private final AppUserRepository appUserRepository;
 
     public HttpCookieSlidingSessionFilter(AccessTokenProvider accessTokenProvider,
-            AuthenticationStateRepository authenticationStateRepository) {
+            AuthenticationStateRepository authenticationStateRepository, AppUserRepository appUserRepository) {
         this.accessTokenProvider = accessTokenProvider;
         this.authenticationStateRepository = authenticationStateRepository;
+        this.appUserRepository = appUserRepository;
     }
 
     @Override
@@ -42,9 +45,7 @@ public class HttpCookieSlidingSessionFilter extends OncePerRequestFilter {
 
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication instanceof JwtAuthenticationToken jwtAuth
-                && authentication.getPrincipal() instanceof AppUser user) {
-
+        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
             final Instant expiresAt = jwtAuth.getToken().getExpiresAt();
             final Instant issuedAt = jwtAuth.getToken().getIssuedAt();
 
@@ -53,8 +54,12 @@ public class HttpCookieSlidingSessionFilter extends OncePerRequestFilter {
                 final long timeElapsed = Instant.now().getEpochSecond() - issuedAt.getEpochSecond();
 
                 if (timeElapsed > (lifetime * REFRESH_THRESHOLD)) {
-                    final String newToken = accessTokenProvider.generateToken(user);
-                    authenticationStateRepository.saveAccessToken(newToken, response);
+                    UUID userId = UUID.fromString(jwtAuth.getToken().getSubject());
+                    appUserRepository.findById(userId).ifPresent(appUser -> {
+                        final SecurityUser securityUser = new SecurityUser(appUser);
+                        final String newToken = accessTokenProvider.generateToken(securityUser);
+                        authenticationStateRepository.saveAccessToken(newToken, response);
+                    });
                 }
             }
         }

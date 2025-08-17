@@ -1,7 +1,7 @@
 package org.salesbind.infrastructure.security.jwt;
 
-import org.salesbind.entity.AppUser;
 import org.salesbind.infrastructure.configuration.AuthenticationProperties;
+import org.salesbind.infrastructure.security.SecurityUser;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -24,12 +24,11 @@ public class SpringJwtAccessTokenProvider implements AccessTokenProvider {
     }
 
     @Override
-    public String generateToken(AppUser appUser) {
+    public String generateToken(SecurityUser user) {
         Instant now = Instant.now();
 
-        //noinspection DataFlowIssue
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(appUser.getId().toString())
+                .subject(String.valueOf(user.appUser().getId()))
                 .issuedAt(now)
                 .expiresAt(now.plus(authenticationProperties.getJwtExpiration()))
                 .build();

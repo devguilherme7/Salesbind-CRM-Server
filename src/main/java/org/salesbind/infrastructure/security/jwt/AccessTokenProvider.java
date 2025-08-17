@@ -1,6 +1,6 @@
 package org.salesbind.infrastructure.security.jwt;
 
-import org.salesbind.entity.AppUser;
+import org.salesbind.infrastructure.security.SecurityUser;
 
 /**
  * Defines a contract for providing access token for a given user.
@@ -14,8 +14,8 @@ public interface AccessTokenProvider {
     /**
      * Generates a new access token for the specified user.
      *
-     * @param appUser The user for whom to generate the token.
+     * @param user The user for whom to generate the token.
      * @return A string representation of the access token.
      */
-    String generateToken(AppUser appUser);
+    String generateToken(SecurityUser user);
 }

@@ -25,6 +25,10 @@ public abstract class AbstractPersistableCustom implements Persistable<UUID> {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     @Override
     public boolean isNew() {
         return this.new_;
