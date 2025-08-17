@@ -1,4 +1,4 @@
-package org.salesbind.infrastructure.authentication;
+package org.salesbind.infrastructure.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.salesbind.entity.AppUser;
 import org.salesbind.infrastructure.security.jwt.AccessTokenProvider;
+import org.salesbind.infrastructure.web.AuthenticationStateRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

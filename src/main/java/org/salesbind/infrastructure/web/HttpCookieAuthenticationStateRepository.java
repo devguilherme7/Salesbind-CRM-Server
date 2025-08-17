@@ -1,4 +1,4 @@
-package org.salesbind.infrastructure.authentication;
+package org.salesbind.infrastructure.web;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

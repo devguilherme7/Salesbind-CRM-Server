@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.salesbind.dto.LoginRequest;
-import org.salesbind.infrastructure.authentication.AuthenticationStateRepository;
+import org.salesbind.infrastructure.web.AuthenticationStateRepository;
 import org.salesbind.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
