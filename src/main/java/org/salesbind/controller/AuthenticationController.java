@@ -3,10 +3,12 @@ package org.salesbind.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.salesbind.dto.LoginRequest;
+import org.salesbind.infrastructure.authentication.AuthenticationStateRepository;
 import org.salesbind.service.AuthenticationService;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,12 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Authentication", description = "Endpoints for user authentication")
 public class AuthenticationController {
 
-    private static final String AUTH_TOKEN_COOKIE = "AUTH_TOKEN";
-    
     private final AuthenticationService authenticationService;
+    private final AuthenticationStateRepository authenticationStateRepository;
 
-    public AuthenticationController(AuthenticationService authenticationService) {
+    public AuthenticationController(AuthenticationService authenticationService,
+            AuthenticationStateRepository authenticationStateRepository) {
         this.authenticationService = authenticationService;
+        this.authenticationStateRepository = authenticationStateRepository;
     }
 
     @Operation(
@@ -34,18 +37,18 @@ public class AuthenticationController {
     @ApiResponse(responseCode = "400", description = "Invalid request body, e.g., malformed email.")
     @ApiResponse(responseCode = "401", description = "Invalid credentials provided.")
     @PostMapping("/login")
-    public ResponseEntity<Void> authenticate(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request,
+            HttpServletResponse httpResponse) {
+
         String accessToken = authenticationService.authenticate(request);
+        authenticationStateRepository.saveAccessToken(accessToken, httpResponse);
 
-        ResponseCookie authCookie = ResponseCookie.from(AUTH_TOKEN_COOKIE)
-                .value(accessToken)
-                .secure(true)
-                .httpOnly(true)
-                .maxAge(3600)
-                .sameSite("Strict")
-                .path("/")
-                .build();
+        return ResponseEntity.ok().build();
+    }
 
-        return ResponseEntity.ok().header("Set-Cookie", authCookie.toString()).build();
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        authenticationStateRepository.removeAccessToken(httpRequest, httpResponse);
+        return ResponseEntity.noContent().build();
     }
 }
