@@ -1,14 +1,15 @@
 package org.salesbind.infrastructure.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.salesbind.exception.CodeRequestTooSoonException;
 import org.salesbind.exception.TooManyFailedAttemptsException;
-import org.salesbind.infrastructure.cookie.RegistrationCookieManager;
+import org.salesbind.infrastructure.web.RegistrationStateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
@@ -28,10 +29,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private final RegistrationCookieManager registrationCookieManager;
+    private final RegistrationStateRepository registrationStateRepository;
 
-    public GlobalExceptionHandler(RegistrationCookieManager registrationCookieManager) {
-        this.registrationCookieManager = registrationCookieManager;
+    public GlobalExceptionHandler(RegistrationStateRepository registrationStateRepository) {
+        this.registrationStateRepository = registrationStateRepository;
     }
 
     @Override
@@ -78,14 +79,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TooManyFailedAttemptsException.class)
     public ResponseEntity<GlobalApiErrorResponse> handleTooManyFailedAttemptsException(
-            TooManyFailedAttemptsException ex) {
+            TooManyFailedAttemptsException ex, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 
         var response = new GlobalApiErrorResponse(ex.getMessage());
-        ResponseCookie clearCookie = registrationCookieManager.clearCookie();
+        registrationStateRepository.removeRegistrationState(httpRequest, httpResponse);
 
-        return ResponseEntity.status(ex.getStatus())
-                .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
-                .body(response);
+        return ResponseEntity.status(ex.getStatus()).body(response);
     }
 
     @ExceptionHandler(CodeRequestTooSoonException.class)

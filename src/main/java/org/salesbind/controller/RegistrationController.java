@@ -3,22 +3,22 @@ package org.salesbind.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.salesbind.dto.CompleteRegistrationRequest;
 import org.salesbind.dto.RequestEmailVerificationRequest;
 import org.salesbind.dto.VerifyCodeRequest;
-import org.salesbind.infrastructure.cookie.RegistrationCookieManager;
+import org.salesbind.infrastructure.web.HttpCookieRegistrationStateRepository;
+import org.salesbind.infrastructure.web.RegistrationStateRepository;
 import org.salesbind.service.RegistrationService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import static org.salesbind.infrastructure.cookie.RegistrationCookieManager.SIGNUP_FLOW_ID_COOKIE_NAME;
 
 @RestController
 @RequestMapping("/v1/registrations")
@@ -26,12 +26,12 @@ import static org.salesbind.infrastructure.cookie.RegistrationCookieManager.SIGN
 public class RegistrationController {
 
     private final RegistrationService registrationService;
-    private final RegistrationCookieManager registrationCookieManager;
+    private final RegistrationStateRepository registrationStateRepository;
 
     public RegistrationController(RegistrationService registrationService,
-            RegistrationCookieManager registrationCookieManager) {
+            RegistrationStateRepository registrationStateRepository) {
         this.registrationService = registrationService;
-        this.registrationCookieManager = registrationCookieManager;
+        this.registrationStateRepository = registrationStateRepository;
     }
 
     @Operation(
@@ -43,21 +43,24 @@ public class RegistrationController {
     @ApiResponse(responseCode = "400", description = "The email may be invalid or this email already verified")
     @ApiResponse(responseCode = "409", description = "The provided email is already registered")
     @PostMapping("/request-verification-code")
-    public ResponseEntity<Void> requestVerification(@Valid @RequestBody RequestEmailVerificationRequest request) {
-        String sid = registrationService.requestEmailVerification(request.email());
+    public ResponseEntity<Void> requestVerification(@Valid @RequestBody RequestEmailVerificationRequest request,
+            HttpServletResponse httpResponse) {
 
-        ResponseCookie cookie = registrationCookieManager.createCookie(sid);
-        return ResponseEntity.accepted().header("Set-Cookie", cookie.toString()).build();
+        String sid = registrationService.requestEmailVerification(request.email());
+        registrationStateRepository.saveRegistrationAttemptSessionId(sid, httpResponse);
+        return ResponseEntity.accepted().build();
     }
 
     @Operation(summary = "Verify the one-time code", description = "Verifies the code sent to the user's email")
     @ApiResponse(responseCode = "204", description = "Verification successful")
     @ApiResponse(responseCode = "400", description = "Invalid code or malformed request. " +
-            "The '" + SIGNUP_FLOW_ID_COOKIE_NAME + "' cookie might be missing")
+            "The '" + HttpCookieRegistrationStateRepository.REGISTRATION_STATE_COOKIE +
+            "' cookie might be missing")
     @ApiResponse(responseCode = "401", description = "The verification session was not found or has expired")
     @ApiResponse(responseCode = "429", description = "Too many failed verification attempts")
     @PostMapping("/verify-code")
-    public ResponseEntity<Void> verifyCode(@CookieValue(SIGNUP_FLOW_ID_COOKIE_NAME) String provisionId,
+    public ResponseEntity<Void> verifyCode(
+            @CookieValue(HttpCookieRegistrationStateRepository.REGISTRATION_STATE_COOKIE) String provisionId,
             @Valid @RequestBody VerifyCodeRequest request) {
 
         registrationService.verifyCode(provisionId, request.verificationCode());
@@ -72,12 +75,13 @@ public class RegistrationController {
     @ApiResponse(responseCode = "401", description = "The verification session was not found or has expired")
     @ApiResponse(responseCode = "409", description = "The provided email is already registered")
     @PostMapping("/complete")
-    public ResponseEntity<Void> complete(@CookieValue(SIGNUP_FLOW_ID_COOKIE_NAME) String provisionId,
-            @Valid @RequestBody CompleteRegistrationRequest request) {
+    public ResponseEntity<Void> complete(
+            @CookieValue(HttpCookieRegistrationStateRepository.REGISTRATION_STATE_COOKIE) String provisionId,
+            @Valid @RequestBody CompleteRegistrationRequest request, HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
 
         registrationService.completeRegistration(provisionId, request);
-
-        ResponseCookie clearCookie = registrationCookieManager.clearCookie();
-        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.SET_COOKIE, clearCookie.toString()).build();
+        registrationStateRepository.removeRegistrationState(httpRequest, httpResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
