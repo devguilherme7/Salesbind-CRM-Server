@@ -10,8 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -40,6 +45,34 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .toList();
 
         var response = new GlobalApiErrorResponse("Validation failed for request", validationErrors);
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException ex,
+            @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+
+        var response = new GlobalApiErrorResponse("Malformed JSON request");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<GlobalApiErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        if (ex instanceof BadCredentialsException || ex instanceof UsernameNotFoundException) {
+            var response = new GlobalApiErrorResponse("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        var response = new GlobalApiErrorResponse("Authentication failed");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<GlobalApiErrorResponse> handleMissingRequestCookieException(
+            MissingRequestCookieException ex) {
+
+        var response = new GlobalApiErrorResponse(String.format("Required cookie '%s' is missing",
+                ex.getCookieName()));
         return ResponseEntity.status(ex.getStatusCode()).body(response);
     }
 
