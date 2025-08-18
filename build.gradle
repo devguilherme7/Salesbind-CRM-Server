@@ -5,6 +5,7 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'com.diffplug.spotless' version '7.2.1'
+    id 'com.github.spotbugs' version '6.2.5'
 }
 
 group = 'org.salesbind'
@@ -92,3 +93,29 @@ spotless {
         trimTrailingWhitespace()
     }
 }
+
+spotbugs {
+    toolVersion = '4.9.4'
+    effort = 'max'
+    reportLevel = 'high'
+}
+
+spotbugsMain {
+    reports {
+        html {
+            required = true
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+spotbugsTest {
+    reports {
+        html {
+            required = true
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+check.dependsOn tasks.named("spotbugsMain")
