@@ -69,6 +69,14 @@ public class AppUser extends AbstractPersistableCustom {
         return email;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }
