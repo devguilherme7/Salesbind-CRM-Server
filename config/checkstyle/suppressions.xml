@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Suppress checks for generated sources, like MapStruct mappers -->
+    <suppress checks="." files="[\\/]build[\\/]generated[\\/]"/>
+
+    <!-- Suppress checks for the main application class -->
+    <suppress checks="HideUtilityClassConstructor" files="Application\.java$"/>
+    <suppress checks="FinalClass" files="Application\.java$"/>
+
+    <!-- Suppress Javadoc checks for test classes -->
+    <suppress checks="Javadoc" files="[\\/]src[\\/]test[\\/]java[\\/]"/>
+
+    <!-- Allow more descriptive test method names -->
+    <suppress checks="MethodName" files="[\\/]src[\\/]test[\\/]java[\\/].*IT\.java$"
+              message="Method name '.*' must match pattern"/>
+    <suppress checks="MethodName" files="[\\/]src[\\/]test[\\/]java[\\/].*Test\.java$"
+              message="Method name '.*' must match pattern"/>
+</suppressions>

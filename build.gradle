@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
+    id 'checkstyle'
 }
 
 group = 'org.salesbind'
@@ -69,3 +70,15 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestCoverageVerification
+
+checkstyle {
+    toolVersion = "10.12.4"
+    configFile = file("config/checkstyle/checkstyle.xml")
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
