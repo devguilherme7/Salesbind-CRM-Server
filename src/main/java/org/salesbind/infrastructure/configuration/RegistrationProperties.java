@@ -1,8 +1,9 @@
 package org.salesbind.infrastructure.configuration;
 
+import java.time.Duration;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import java.time.Duration;
 
 @Component
 @ConfigurationProperties(prefix = "salesbind.registration")

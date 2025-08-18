@@ -1,12 +1,13 @@
 package org.salesbind.service;
 
+import java.util.UUID;
+
 import org.salesbind.dto.UserResponse;
 import org.salesbind.exception.UserNotFoundException;
 import org.salesbind.mapper.UserMapper;
 import org.salesbind.repository.AppUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {

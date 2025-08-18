@@ -1,7 +1,8 @@
 package org.salesbind.infrastructure.configuration;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "salesbind.authentication")
 public class AuthenticationProperties {

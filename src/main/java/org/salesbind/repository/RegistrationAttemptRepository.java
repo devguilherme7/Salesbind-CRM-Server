@@ -1,8 +1,9 @@
 package org.salesbind.repository;
 
-import org.salesbind.entity.RegistrationAttempt;
 import java.time.Duration;
 import java.util.Optional;
+
+import org.salesbind.entity.RegistrationAttempt;
 
 public interface RegistrationAttemptRepository {
 

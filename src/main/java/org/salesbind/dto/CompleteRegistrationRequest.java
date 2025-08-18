@@ -1,9 +1,11 @@
 package org.salesbind.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 import org.salesbind.validator.Password;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record CompleteRegistrationRequest(
         @NotBlank @Size(min = 3, max = 50)

@@ -1,7 +1,8 @@
 package org.salesbind.infrastructure.security;
 
-import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
+
+import org.springframework.stereotype.Component;
 
 @Component
 public class OneTimeCodeGeneratorImpl implements OneTimeCodeGenerator {

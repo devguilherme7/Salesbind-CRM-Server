@@ -1,12 +1,14 @@
 package org.salesbind.infrastructure.redis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
+import java.util.Optional;
+
 import org.salesbind.entity.RegistrationAttempt;
 import org.salesbind.repository.RegistrationAttemptRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
-import java.time.Duration;
-import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Repository
 public class RedisRegistrationAttemptRepository implements RegistrationAttemptRepository {

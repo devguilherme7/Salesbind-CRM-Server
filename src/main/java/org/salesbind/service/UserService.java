@@ -1,7 +1,8 @@
 package org.salesbind.service;
 
-import org.salesbind.dto.UserResponse;
 import java.util.UUID;
+
+import org.salesbind.dto.UserResponse;
 
 public interface UserService {
 

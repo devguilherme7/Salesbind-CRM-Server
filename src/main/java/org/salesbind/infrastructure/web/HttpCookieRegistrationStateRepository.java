@@ -2,6 +2,7 @@ package org.salesbind.infrastructure.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
 import org.salesbind.infrastructure.util.CookieUtils;
 import org.springframework.stereotype.Repository;

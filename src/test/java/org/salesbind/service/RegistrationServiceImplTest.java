@@ -1,5 +1,9 @@
 package org.salesbind.service;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,9 +33,7 @@ import org.salesbind.repository.AppUserRepository;
 import org.salesbind.repository.OrganizationMemberRepository;
 import org.salesbind.repository.OrganizationRepository;
 import org.salesbind.repository.RegistrationAttemptRepository;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

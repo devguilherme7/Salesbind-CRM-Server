@@ -1,5 +1,9 @@
 package org.salesbind.service;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.UUID;
+
 import org.salesbind.dto.CompleteRegistrationRequest;
 import org.salesbind.entity.AppUser;
 import org.salesbind.entity.Organization;
@@ -7,13 +11,13 @@ import org.salesbind.entity.OrganizationMember;
 import org.salesbind.entity.RegistrationAttempt;
 import org.salesbind.entity.VerificationCode;
 import org.salesbind.exception.CodeRequestTooSoonException;
+import org.salesbind.exception.EmailAlreadyRegisteredException;
 import org.salesbind.exception.EmailAlreadyVerifiedException;
 import org.salesbind.exception.EmailNotVerifiedException;
-import org.salesbind.exception.InvalidVerificationCodeException;
 import org.salesbind.exception.InvalidRegistrationAttempt;
+import org.salesbind.exception.InvalidVerificationCodeException;
 import org.salesbind.exception.TooManyFailedAttemptsException;
 import org.salesbind.infrastructure.configuration.RegistrationProperties;
-import org.salesbind.exception.EmailAlreadyRegisteredException;
 import org.salesbind.infrastructure.email.EmailService;
 import org.salesbind.infrastructure.security.AppPasswordEncoder;
 import org.salesbind.infrastructure.security.OneTimeCodeGenerator;
@@ -23,9 +27,6 @@ import org.salesbind.repository.OrganizationRepository;
 import org.salesbind.repository.RegistrationAttemptRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.UUID;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
@@ -93,7 +94,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(InvalidRegistrationAttempt::new);
 
         if (attempt.isVerified()) {
-            return; // Success. Idempotent
+            return;
         }
 
         if (attempt.hasExceededMaxAttempts(registrationProperties.getOneTimeCode().getMaxAttempts())) {

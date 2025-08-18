@@ -1,8 +1,9 @@
 package org.salesbind.exception;
 
+import java.time.Duration;
+
 import org.salesbind.infrastructure.exception.AbstractStatusResponseException;
 import org.springframework.http.HttpStatus;
-import java.time.Duration;
 
 public class CodeRequestTooSoonException extends AbstractStatusResponseException {
 
