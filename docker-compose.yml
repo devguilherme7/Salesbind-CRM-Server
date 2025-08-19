@@ -9,6 +9,11 @@ services:
       POSTGRES_DB: salesbind
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d salesbind" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7.4.4
@@ -16,6 +21,32 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  salesbind:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SALESBIND_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/salesbind
+      SALESBIND_DATASOURCE_USERNAME: postgres
+      SALESBIND_DATASOURCE_PASSWORD: postgres
+      SALESBIND_REDIS_HOST: redis
+      SALESBIND_REDIS_PORT: 6379
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
 
 volumes:
   pg_data:
