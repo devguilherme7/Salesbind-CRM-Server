@@ -7,7 +7,7 @@ Before running the project, make sure you have the following installed:
 
 > Make sure Docker is running before starting the application with Docker Compose
 
-## Running the Application with Docker and Docker Compose
+## Running the Application with Docker and Docker Compose (Development Mode)
 
 We use a hybrid approach for development:
 
@@ -16,10 +16,20 @@ We use a hybrid approach for development:
 - The Spring Boot application runs directly on the host machine, enabling hot-reloading in your IDE and faster feedback
   loops.
 
-1. Start the dependent services with Docker Compose: `docker compose up -d`
+1. Start the dependent services with Docker Compose: `docker-compose -f docker-compose-development.yml up -d`
 2. Run the Spring Boot application: `./gradlew bootRun`.
 
 This approach gives you the stability of containerized services and the agility of local development.
+
+## MailHog for Email Testing
+
+In the development environment, we use [MailHog](https://github.com/mailhog/MailHog) to capture and display emails sent
+by the application. This is useful for testing features like user registration, notifications, and other email-based
+workflows without sending real emails.
+
+After starting the development environment, you can access the MailHog web interface
+at [http://localhost:8025](http://localhost:8025). All emails sent by the application will appear in the MailHog inbox,
+where you can view their content, headers, and other details.
 
 ## Swagger API Documentation
 
