@@ -49,6 +49,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RegistrationServiceImplTest {
 
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_CODE = "789321";
+    private static final String PROVISION_ID = "testid";
+
     @Mock
     private RegistrationAttemptRepository attemptRepository;
 
@@ -81,10 +85,6 @@ class RegistrationServiceImplTest {
 
     @Captor
     private ArgumentCaptor<RegistrationAttempt> attemptCaptor;
-
-    private static final String TEST_EMAIL = "test@example.com";
-    private static final String TEST_CODE = "789321";
-    private static final String PROVISION_ID = "testid";
 
     @BeforeEach
     void setUp() {
@@ -239,7 +239,7 @@ class RegistrationServiceImplTest {
             when(attempt.isVerified()).thenReturn(true);
             when(attempt.getEmail()).thenReturn(TEST_EMAIL);
             when(attemptRepository.findByProvisionId(PROVISION_ID)).thenReturn(Optional.of(attempt));
-            when(appUserRepository.existsByEmail(TEST_EMAIL)).thenReturn(true); // Race condition
+            when(appUserRepository.existsByEmail(TEST_EMAIL)).thenReturn(true);
 
             assertThatThrownBy(() -> registrationService.completeRegistration(PROVISION_ID, request))
                     .isInstanceOf(EmailAlreadyRegisteredException.class);
