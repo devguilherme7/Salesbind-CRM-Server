@@ -16,6 +16,8 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
+ij_continuation_indent_size = 8
+
 # This layout matches the Spotless configuration to prevent reordering conflicts.
 # It groups imports logically and separates static imports.
 ij_java_imports_layout = java.**, |, javax.**, |, jakarta.**, |, org.**, |, com.**, |, *, $*

@@ -14,9 +14,6 @@
     <!-- Suppress Javadoc checks for test classes -->
     <suppress checks="Javadoc" files="[\\/]src[\\/]test[\\/]java[\\/]"/>
 
-    <!-- Allow more descriptive test method names -->
-    <suppress checks="MethodName" files="[\\/]src[\\/]test[\\/]java[\\/].*IT\.java$"
-              message="Method name '.*' must match pattern"/>
-    <suppress checks="MethodName" files="[\\/]src[\\/]test[\\/]java[\\/].*Test\.java$"
-              message="Method name '.*' must match pattern"/>
+    <!-- Suppress MagicNumber check for test classes as they often use numbers for test data -->
+    <suppress checks="MagicNumber" files="[\\/]src[\\/]test[\\/]java[\\/]"/>
 </suppressions>
