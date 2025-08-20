@@ -1,11 +1,12 @@
 package org.salesbind.infrastructure.security;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.salesbind.entity.AppUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * An implementation of {@link UserDetails} that wraps an {@link AppUser} entity.
@@ -17,7 +18,7 @@ public record SecurityUser(AppUser appUser) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER")); // TODO
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

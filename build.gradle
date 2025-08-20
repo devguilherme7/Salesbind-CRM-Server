@@ -3,6 +3,9 @@ plugins {
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
+    id 'checkstyle'
+    id 'com.diffplug.spotless' version '7.2.1'
+    id 'com.github.spotbugs' version '6.2.5'
 }
 
 group = 'org.salesbind'
@@ -69,3 +72,50 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestCoverageVerification
+
+checkstyle {
+    toolVersion = "10.12.4"
+    configFile = file("config/checkstyle/checkstyle.xml")
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+spotless {
+    java {
+        removeUnusedImports()
+        importOrder('java', 'javax', 'jakarta', 'org', 'com', '\\#')
+        endWithNewline()
+        trimTrailingWhitespace()
+    }
+}
+
+spotbugs {
+    toolVersion = '4.9.4'
+    effort = 'max'
+    reportLevel = 'high'
+}
+
+spotbugsMain {
+    reports {
+        html {
+            required = true
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+spotbugsTest {
+    reports {
+        html {
+            required = true
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+check.dependsOn tasks.named("spotbugsMain")

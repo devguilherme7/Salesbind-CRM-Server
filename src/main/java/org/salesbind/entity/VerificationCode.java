@@ -17,8 +17,12 @@ public class VerificationCode {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
 
         var that = (VerificationCode) obj;
 
@@ -26,6 +30,11 @@ public class VerificationCode {
         byte[] aBytes = this.value.getBytes(StandardCharsets.UTF_8);
         byte[] bBytes = that.value.getBytes(StandardCharsets.UTF_8);
         return MessageDigest.isEqual(aBytes, bBytes);
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
     }
 
     public String getValue() {

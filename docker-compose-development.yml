@@ -1,0 +1,16 @@
+services:
+  db:
+    extends:
+      service: postgres
+      file: ./config/docker/postgres.yml
+
+  redis:
+    extends:
+      service: redis
+      file: ./config/docker/redis.yml
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"

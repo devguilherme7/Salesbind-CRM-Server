@@ -1,12 +1,14 @@
 package org.salesbind.infrastructure.web;
 
+import java.util.Optional;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.salesbind.infrastructure.configuration.AuthenticationProperties;
 import org.salesbind.infrastructure.util.CookieUtils;
 import org.springframework.stereotype.Component;
-import java.util.Optional;
 
 @Component
 public class HttpCookieAuthenticationStateRepository implements AuthenticationStateRepository {

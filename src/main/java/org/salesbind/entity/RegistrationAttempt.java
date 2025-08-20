@@ -23,8 +23,8 @@ public class RegistrationAttempt {
     protected RegistrationAttempt() {
     }
 
-    public void assignVerificationCode(VerificationCode verificationCode, Instant expiresAt) {
-        this.verificationCode = verificationCode;
+    public void assignVerificationCode(VerificationCode newVerificationCode, Instant expiresAt) {
+        this.verificationCode = newVerificationCode;
         this.verificationCodeExpiresAt = expiresAt;
         this.verified = false;
         this.failedAttempts = 0;

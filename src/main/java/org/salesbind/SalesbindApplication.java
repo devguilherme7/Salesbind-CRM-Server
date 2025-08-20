@@ -9,5 +9,4 @@ public class SalesbindApplication {
     public static void main(String[] args) {
         SpringApplication.run(SalesbindApplication.class, args);
     }
-
 }

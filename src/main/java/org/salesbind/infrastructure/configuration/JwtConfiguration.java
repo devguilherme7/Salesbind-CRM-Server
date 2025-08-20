@@ -1,10 +1,7 @@
 package org.salesbind.infrastructure.configuration;
 
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.nimbusds.jose.proc.JWEDecryptionKeySelector;
-import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import java.util.Base64;
+
 import org.salesbind.infrastructure.security.jwt.EncryptedJwtEncoder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +9,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import java.util.Base64;
+
+import com.nimbusds.jose.EncryptionMethod;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.nimbusds.jose.proc.JWEDecryptionKeySelector;
+import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 
 @Configuration
 @EnableConfigurationProperties(AuthenticationProperties.class)

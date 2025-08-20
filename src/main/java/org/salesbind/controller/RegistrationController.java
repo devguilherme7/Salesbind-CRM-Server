@@ -1,11 +1,9 @@
 package org.salesbind.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import org.salesbind.dto.CompleteRegistrationRequest;
 import org.salesbind.dto.RequestEmailVerificationRequest;
 import org.salesbind.dto.VerifyCodeRequest;
@@ -19,6 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/v1/registrations")
@@ -36,9 +38,9 @@ public class RegistrationController {
 
     @Operation(
             summary = "Request a verification code",
-            description = "Initiates the registration process by sending a verification code to user's email. " +
-                    "This endpoint can also be used to resend the code if the previous one was not received or " +
-                    "has expired")
+            description = "Initiates the registration process by sending a verification code to user's email. "
+                    + "This endpoint can also be used to resend the code if the previous one was not received or "
+                    + "has expired")
     @ApiResponse(responseCode = "202", description = "Verification code request accepted. An email has been dispatched")
     @ApiResponse(responseCode = "400", description = "The email may be invalid or this email already verified")
     @ApiResponse(responseCode = "409", description = "The provided email is already registered")
@@ -53,9 +55,9 @@ public class RegistrationController {
 
     @Operation(summary = "Verify the one-time code", description = "Verifies the code sent to the user's email")
     @ApiResponse(responseCode = "204", description = "Verification successful")
-    @ApiResponse(responseCode = "400", description = "Invalid code or malformed request. " +
-            "The '" + HttpCookieRegistrationStateRepository.REGISTRATION_STATE_COOKIE +
-            "' cookie might be missing")
+    @ApiResponse(responseCode = "400", description = "Invalid code or malformed request. "
+            + "The '" + HttpCookieRegistrationStateRepository.REGISTRATION_STATE_COOKIE
+            + "' cookie might be missing")
     @ApiResponse(responseCode = "401", description = "The verification session was not found or has expired")
     @ApiResponse(responseCode = "429", description = "Too many failed verification attempts")
     @PostMapping("/verify-code")
@@ -67,11 +69,11 @@ public class RegistrationController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Complete the registration process", description = "Finalizes the account creation after " +
-            "successful email verification. This creates the user and their organization")
+    @Operation(summary = "Complete the registration process", description = "Finalizes the account creation after "
+            + "successful email verification. This creates the user and their organization")
     @ApiResponse(responseCode = "201", description = "User and organization created successfully")
-    @ApiResponse(responseCode = "400", description = "Input data is invalid (e.g., weak password) or the email has " +
-            "not been verified yet")
+    @ApiResponse(responseCode = "400", description = "Input data is invalid (e.g., weak password) or the email has "
+            + "not been verified yet")
     @ApiResponse(responseCode = "401", description = "The verification session was not found or has expired")
     @ApiResponse(responseCode = "409", description = "The provided email is already registered")
     @PostMapping("/complete")

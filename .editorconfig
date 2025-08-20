@@ -1,0 +1,38 @@
+# EditorConfig helps developers define and maintain consistent
+# coding styles between different editors and IDEs.
+# For more details, see https://editorconfig.org/
+
+# This is the top-most .editorconfig file
+root = true
+
+# Universal settings for all file types
+[*]
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.java]
+indent_style = space
+indent_size = 4
+
+ij_continuation_indent_size = 8
+
+# This layout matches the Spotless configuration to prevent reordering conflicts.
+# It groups imports logically and separates static imports.
+ij_java_imports_layout = java.**, |, javax.**, |, jakarta.**, |, org.**, |, com.**, |, *, $*
+
+# Disable "import on demand" (star imports) to align with Checkstyle.
+# The high number effectively means "never use star imports".
+ij_java_class_count_to_use_import_on_demand = 999
+ij_java_names_count_to_use_import_on_demand = 999
+
+ij_java_blank_lines_after_class_header = 1
+
+[*.gradle]
+indent_style = space
+indent_size = 4
+
+[*.{xml,properties,md}]
+indent_style = space
+indent_size = 4

@@ -1,7 +1,8 @@
 package org.salesbind.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record UserResponse(
         UUID id,

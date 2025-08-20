@@ -1,7 +1,10 @@
 package org.salesbind.infrastructure.exception;
 
+import java.util.List;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.salesbind.exception.CodeRequestTooSoonException;
 import org.salesbind.exception.TooManyFailedAttemptsException;
 import org.salesbind.infrastructure.web.RegistrationStateRepository;
@@ -22,7 +25,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
