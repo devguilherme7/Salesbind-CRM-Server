@@ -136,8 +136,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         appUserRepository.save(user);
 
         OrganizationMember membership = OrganizationMember.create(organization, user);
-        organization.addMember(membership);
-
         organizationMemberRepository.save(membership);
 
         attemptRepository.delete(attempt);
