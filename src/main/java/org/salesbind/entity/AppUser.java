@@ -1,14 +1,10 @@
 package org.salesbind.entity;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -43,9 +39,6 @@ public class AppUser extends AbstractPersistableCustom {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrganizationMember> memberships = new HashSet<>();
-
     public AppUser(String email, String firstName, String lastName, String passwordHash) {
         this.email = email.toLowerCase().trim();
         this.firstName = firstName.trim();
@@ -58,9 +51,8 @@ public class AppUser extends AbstractPersistableCustom {
         //
     }
 
-    public void addMembership(OrganizationMember membership) {
-        memberships.add(membership);
-        membership.setUser(this);
+    public static AppUser create(String email, String firstName, String lastName, String passwordHash) {
+        return new AppUser(email, firstName, lastName, passwordHash);
     }
 
     public void verifyEmail() {

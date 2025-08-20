@@ -43,10 +43,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final EmailService emailService;
 
     public RegistrationServiceImpl(RegistrationAttemptRepository attemptRepository,
-            RegistrationProperties registrationProperties, OneTimeCodeGenerator oneTimeCodeGenerator,
-            OrganizationRepository organizationRepository, AppPasswordEncoder passwordEncoder,
-            AppUserRepository appUserRepository, OrganizationMemberRepository organizationMemberRepository,
-            EmailService emailService) {
+                                   RegistrationProperties registrationProperties, OneTimeCodeGenerator oneTimeCodeGenerator,
+                                   OrganizationRepository organizationRepository, AppPasswordEncoder passwordEncoder,
+                                   AppUserRepository appUserRepository, OrganizationMemberRepository organizationMemberRepository,
+                                   EmailService emailService) {
         this.attemptRepository = attemptRepository;
         this.registrationProperties = registrationProperties;
         this.oneTimeCodeGenerator = oneTimeCodeGenerator;
@@ -127,21 +127,18 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new EmailAlreadyRegisteredException();
         }
 
-        var organization = new Organization(request.organizationName());
+        Organization organization = Organization.create(request.organizationName());
         organizationRepository.save(organization);
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        var user = new AppUser(attempt.getEmail(), request.firstName(), request.lastName(), encodedPassword);
+        AppUser user = AppUser.create(attempt.getEmail(), request.firstName(), request.lastName(), encodedPassword);
         user.verifyEmail();
         appUserRepository.save(user);
 
-        var membership = new OrganizationMember();
-        membership.setUser(user);
-        membership.setOrganization(organization);
-        organizationMemberRepository.save(membership);
-
-        user.addMembership(membership);
+        OrganizationMember membership = OrganizationMember.create(organization, user);
         organization.addMember(membership);
+
+        organizationMemberRepository.save(membership);
 
         attemptRepository.delete(attempt);
     }

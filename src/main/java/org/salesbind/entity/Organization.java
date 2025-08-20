@@ -41,6 +41,10 @@ public class Organization extends AbstractPersistableCustom {
         this.name = name;
     }
 
+    public static Organization create(String name) {
+        return new Organization(name);
+    }
+
     protected Organization() {
         //
     }

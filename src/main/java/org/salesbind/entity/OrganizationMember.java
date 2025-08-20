@@ -64,6 +64,18 @@ public class OrganizationMember extends AbstractPersistableCustom {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    protected OrganizationMember() {
+    }
+
+    public OrganizationMember(Organization organization, AppUser user) {
+        this.organization = organization;
+        this.user = user;
+    }
+
+    public static OrganizationMember create(Organization organization, AppUser user) {
+        return new OrganizationMember(organization, user);
+    }
+
     public AppUser getUser() {
         return user;
     }
