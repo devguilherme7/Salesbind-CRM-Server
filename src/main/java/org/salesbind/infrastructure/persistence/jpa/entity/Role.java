@@ -1,4 +1,4 @@
-package org.salesbind.entity;
+package org.salesbind.infrastructure.persistence.jpa.entity;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -46,7 +46,7 @@ public class Role extends AbstractPersistableCustom {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
-    private Organization organization;
+    private OrganizationJpaEntity organization;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_permissions",

@@ -127,21 +127,16 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new EmailAlreadyRegisteredException();
         }
 
-        var organization = new Organization(request.organizationName());
-        organizationRepository.save(organization);
+        Organization organization = Organization.create(request.organizationName());
+        organization = organizationRepository.save(organization);
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        var user = new AppUser(attempt.getEmail(), request.firstName(), request.lastName(), encodedPassword);
+        AppUser user = AppUser.create(attempt.getEmail(), request.firstName(), request.lastName(), encodedPassword);
         user.verifyEmail();
-        appUserRepository.save(user);
+        user = appUserRepository.save(user);
 
-        var membership = new OrganizationMember();
-        membership.setUser(user);
-        membership.setOrganization(organization);
+        OrganizationMember membership = OrganizationMember.create(organization, user);
         organizationMemberRepository.save(membership);
-
-        user.addMembership(membership);
-        organization.addMember(membership);
 
         attemptRepository.delete(attempt);
     }

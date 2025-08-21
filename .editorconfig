@@ -29,6 +29,8 @@ ij_java_names_count_to_use_import_on_demand = 999
 
 ij_java_blank_lines_after_class_header = 1
 
+ij_java_align_multiline_parameters = false
+
 [*.gradle]
 indent_style = space
 indent_size = 4
