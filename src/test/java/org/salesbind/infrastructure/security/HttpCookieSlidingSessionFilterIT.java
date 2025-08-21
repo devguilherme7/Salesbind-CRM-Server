@@ -67,12 +67,11 @@ class HttpCookieSlidingSessionFilterIT {
     void setUp() {
         UUID id = UUID.randomUUID();
 
-        testUser = new AppUser("testuser@example.com", "Test", "User", "password");
+        testUser = AppUser.create("testuser@example.com", "Test", "User", "password");
         testUser.setId(id);
     }
 
     @Test
-    @SuppressWarnings("DataFlowIssue")
     void shouldReturnRefreshedTokenInCookieWhenRequestHasOldToken() throws Exception {
         Instant issuedAt = Instant.now().minus(TOKEN_LIFETIME.multipliedBy(6).dividedBy(10));
         Instant expiresAt = issuedAt.plus(TOKEN_LIFETIME);
@@ -87,8 +86,9 @@ class HttpCookieSlidingSessionFilterIT {
                 .andReturn();
 
         String setCookieHeader = result.getResponse().getHeader(HttpHeaders.SET_COOKIE);
-        assertThat(setCookieHeader).contains(HttpCookieAuthenticationStateRepository.AUTH_TOKEN_COOKIE_NAME + "=");
-        assertThat(setCookieHeader).doesNotContain(oldToken);
+        assertThat(setCookieHeader)
+                .contains(HttpCookieAuthenticationStateRepository.AUTH_TOKEN_COOKIE_NAME + "=")
+                .doesNotContain(oldToken);
     }
 
     @Test
