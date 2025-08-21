@@ -43,10 +43,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final EmailService emailService;
 
     public RegistrationServiceImpl(RegistrationAttemptRepository attemptRepository,
-                                   RegistrationProperties registrationProperties, OneTimeCodeGenerator oneTimeCodeGenerator,
-                                   OrganizationRepository organizationRepository, AppPasswordEncoder passwordEncoder,
-                                   AppUserRepository appUserRepository, OrganizationMemberRepository organizationMemberRepository,
-                                   EmailService emailService) {
+            RegistrationProperties registrationProperties, OneTimeCodeGenerator oneTimeCodeGenerator,
+            OrganizationRepository organizationRepository, AppPasswordEncoder passwordEncoder,
+            AppUserRepository appUserRepository, OrganizationMemberRepository organizationMemberRepository,
+            EmailService emailService) {
         this.attemptRepository = attemptRepository;
         this.registrationProperties = registrationProperties;
         this.oneTimeCodeGenerator = oneTimeCodeGenerator;
@@ -128,12 +128,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         Organization organization = Organization.create(request.organizationName());
-        organizationRepository.save(organization);
+        organization = organizationRepository.save(organization);
 
         String encodedPassword = passwordEncoder.encode(request.password());
         AppUser user = AppUser.create(attempt.getEmail(), request.firstName(), request.lastName(), encodedPassword);
         user.verifyEmail();
-        appUserRepository.save(user);
+        user = appUserRepository.save(user);
 
         OrganizationMember membership = OrganizationMember.create(organization, user);
         organizationMemberRepository.save(membership);
