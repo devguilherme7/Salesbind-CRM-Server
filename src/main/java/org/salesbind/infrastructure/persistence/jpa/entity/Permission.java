@@ -1,11 +1,9 @@
-package org.salesbind.entity;
+package org.salesbind.infrastructure.persistence.jpa.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-
-import org.salesbind.infrastructure.persistence.jpa.entity.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "permissions",
