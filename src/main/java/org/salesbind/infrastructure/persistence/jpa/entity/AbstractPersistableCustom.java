@@ -1,4 +1,4 @@
-package org.salesbind.entity;
+package org.salesbind.infrastructure.persistence.jpa.entity;
 
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public abstract class AbstractPersistableCustom implements Persistable<UUID> {
     private UUID id;
 
     @Transient
-    private boolean new_ = true;
+    private boolean isNew = true;
 
     @Override
     public UUID getId() {
@@ -33,12 +33,12 @@ public abstract class AbstractPersistableCustom implements Persistable<UUID> {
 
     @Override
     public boolean isNew() {
-        return this.new_;
+        return this.isNew;
     }
 
     @PrePersist
     @PostLoad
     public void markNowNew() {
-        this.new_ = false;
+        this.isNew = false;
     }
 }

@@ -1,6 +1,6 @@
 package org.salesbind.entity;
 
-public class AppUser extends AggregateRoot {
+public final class AppUser extends AggregateRoot {
 
     private final String email;
     private final String firstName;

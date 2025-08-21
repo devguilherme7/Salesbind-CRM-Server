@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
+import org.salesbind.infrastructure.persistence.jpa.entity.AbstractPersistableCustom;
+
 @Entity
 @Table(name = "permissions",
         indexes = {

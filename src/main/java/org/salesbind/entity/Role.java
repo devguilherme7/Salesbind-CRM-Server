@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import org.salesbind.infrastructure.persistence.jpa.entity.AbstractPersistableCustom;
 import org.salesbind.infrastructure.persistence.jpa.entity.OrganizationJpaEntity;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
