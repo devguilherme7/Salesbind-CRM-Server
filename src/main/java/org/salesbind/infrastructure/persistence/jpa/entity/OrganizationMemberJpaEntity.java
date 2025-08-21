@@ -17,7 +17,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 import org.salesbind.entity.AbstractPersistableCustom;
-import org.salesbind.entity.AppUser;
 import org.salesbind.entity.Role;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -42,11 +41,11 @@ public class OrganizationMemberJpaEntity extends AbstractPersistableCustom {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private AppUser user;
+    private AppUserJpaEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invited_by")
-    private AppUser invitedBy;
+    private AppUserJpaEntity invitedBy;
 
     private LocalDateTime invitedAt;
 
@@ -75,19 +74,19 @@ public class OrganizationMemberJpaEntity extends AbstractPersistableCustom {
         this.organization = organization;
     }
 
-    public AppUser getUser() {
+    public AppUserJpaEntity getUser() {
         return user;
     }
 
-    public void setUser(AppUser user) {
+    public void setUser(AppUserJpaEntity user) {
         this.user = user;
     }
 
-    public AppUser getInvitedBy() {
+    public AppUserJpaEntity getInvitedBy() {
         return invitedBy;
     }
 
-    public void setInvitedBy(AppUser invitedBy) {
+    public void setInvitedBy(AppUserJpaEntity invitedBy) {
         this.invitedBy = invitedBy;
     }
 
